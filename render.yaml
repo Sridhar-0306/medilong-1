@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: hospital-booking
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_HOST
+        value: sql3.freesqldatabase.com
+      - key: DB_PORT
+        value: 3306
+      - key: DB_NAME
+        value: sql3793147
+      - key: DB_USER
+        value: sql3793147
+      - key: DB_PASS
+        value: TUhmBbWKwT
