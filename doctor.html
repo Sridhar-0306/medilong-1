@@ -1,0 +1,2908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard | Medilong</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6a11cb;
+      --secondary: #2575fc;
+      --success: #4CAF50;
+      --warning: #FFA500;
+      --danger: #FF416C;
+      --dark: #2c3e50;
+      --light: #f8f9fa;
+      --gray: #95a5a6;
+      --white: #ffffff;
+      --sidebar-width: 280px;
+      --header-height: 80px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fa;
+      color: var(--dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      position: fixed;
+      height: 100vh;
+      padding: 20px 0;
+      transition: var(--transition);
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-collapsed {
+      width: 80px;
+    }
+
+    .sidebar-collapsed .logo-text,
+    .sidebar-collapsed .nav-item-text {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-item {
+      justify-content: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      margin-bottom: 30px;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+
+    .nav-menu {
+      margin-top: 20px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      margin: 5px 0;
+      cursor: pointer;
+      transition: var(--transition);
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.2);
+      border-left: 3px solid var(--white);
+    }
+
+    .nav-icon {
+      font-size: 1.2rem;
+      margin-right: 15px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .nav-item-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .toggle-sidebar {
+      position: absolute;
+      right: -12px;
+      top: 20px;
+      background: var(--white);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .toggle-sidebar i {
+      color: var(--primary);
+      font-size: 0.8rem;
+      transition: var(--transition);
+    }
+
+    .sidebar-collapsed .toggle-sidebar i {
+      transform: rotate(180deg);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: var(--transition);
+    }
+
+    .sidebar-collapsed ~ .main-content {
+      margin-left: 80px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      height: var(--header-height);
+      background: var(--white);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left h1 {
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .search-bar {
+      position: relative;
+    }
+
+    .search-bar input {
+      padding: 8px 15px 8px 35px;
+      border: 1px solid #e0e0e0;
+      border-radius: 20px;
+      outline: none;
+      width: 200px;
+      transition: var(--transition);
+    }
+
+    .search-bar input:focus {
+      width: 250px;
+      border-color: var(--primary);
+    }
+
+    .search-bar i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .user-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-bell i {
+      font-size: 1.2rem;
+      color: var(--dark);
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: var(--white);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 600;
+    }
+
+    /* Dashboard Content */
+    .content-wrapper {
+      padding: 30px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .welcome-message h2 {
+      font-size: 1.8rem;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+
+    .welcome-message p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .date-time {
+      background: var(--white);
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+    }
+
+    .stat-card.primary::before {
+      background: var(--primary);
+    }
+
+    .stat-card.warning::before {
+      background: var(--warning);
+    }
+
+    .stat-card.danger::before {
+      background: var(--danger);
+    }
+
+    .stat-card.success::before {
+      background: var(--success);
+    }
+
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .stat-card-title {
+      font-size: 0.9rem;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .stat-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+    }
+
+    .stat-card.primary .stat-card-icon {
+      background: rgba(106, 17, 203, 0.1);
+      color: var(--primary);
+    }
+
+    .stat-card.warning .stat-card-icon {
+      background: rgba(255, 165, 0, 0.1);
+      color: var(--warning);
+    }
+
+    .stat-card.danger .stat-card-icon {
+      background: rgba(255, 65, 108, 0.1);
+      color: var(--danger);
+    }
+
+    .stat-card.success .stat-card-icon {
+      background: rgba(76, 175, 80, 0.1);
+      color: var(--success);
+    }
+
+    .stat-card-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-card-footer {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+
+    .trend-up {
+      color: var(--success);
+    }
+
+    .trend-down {
+      color: var(--danger);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+      color: var(--primary);
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .action-button {
+      background: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      text-decoration: none;
+      color: var(--dark);
+    }
+
+    .action-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      color: var(--primary);
+    }
+
+    .action-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(106, 17, 203, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    .action-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* Dashboard Sections */
+    .dashboard-sections {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-sections {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Widgets */
+    .widget {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .widget-title {
+      font-size: 1.1rem;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .widget-title i {
+      margin-right: 10px;
+      color: var(--primary);
+    }
+
+    .widget-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .widget-action {
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .widget-action:hover {
+      color: var(--primary);
+    }
+
+    /* Appointments Widget */
+    .appointment-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .appointment-item:last-child {
+      border-bottom: none;
+    }
+
+    .appointment-time {
+      min-width: 80px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .appointment-details {
+      flex: 1;
+      margin: 0 15px;
+    }
+
+    .patient-name {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .appointment-purpose {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .appointment-status {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .status-confirmed {
+      background: rgba(76, 175, 80, 0.1);
+      color: var(--success);
+    }
+
+    .status-pending {
+      background: rgba(255, 165, 0, 0.1);
+      color: var(--warning);
+    }
+
+    .appointment-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .appointment-action {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(106, 17, 203, 0.1);
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .appointment-action:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* Patients Widget */
+    .patient-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .patient-item:last-child {
+      border-bottom: none;
+    }
+
+    .patient-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(106, 17, 203, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .patient-info {
+      flex: 1;
+    }
+
+    .patient-name {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .patient-meta {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .patient-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .patient-action {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(106, 17, 203, 0.1);
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .patient-action:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* Tasks Widget */
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-checkbox {
+      margin-right: 15px;
+    }
+
+    .task-content {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .task-completed {
+      text-decoration: line-through;
+      color: var(--gray);
+    }
+
+    .task-priority {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+
+    .priority-high {
+      background: rgba(255, 65, 108, 0.1);
+      color: var(--danger);
+    }
+
+    .priority-medium {
+      background: rgba(255, 165, 0, 0.1);
+      color: var(--warning);
+    }
+
+    .priority-low {
+      background: rgba(106, 17, 203, 0.1);
+      color: var(--primary);
+    }
+
+    .task-due {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 3px;
+    }
+
+    /* Messages Widget */
+    .message-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+
+    .message-item:last-child {
+      border-bottom: none;
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(106, 17, 203, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .message-content {
+      flex: 1;
+    }
+
+    .message-sender {
+      font-weight: 600;
+      margin-bottom: 3px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      color: var(--gray);
+      font-weight: normal;
+    }
+
+    .message-preview {
+      font-size: 0.8rem;
+      color: var(--gray);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .message-unread .message-sender,
+    .message-unread .message-preview {
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* Calendar Widget */
+    .calendar-widget {
+      grid-column: span 2;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1200px) {
+      .calendar-widget {
+        grid-column: span 1;
+      }
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .calendar-nav-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(106, 17, 203, 0.1);
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calendar-nav-button:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 600;
+      padding: 10px 5px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      background: var(--white);
+      border-radius: 5px;
+      padding: 5px;
+      position: relative;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .calendar-day:hover {
+      background: rgba(106, 17, 203, 0.05);
+    }
+
+    .calendar-day.empty {
+      background: transparent;
+      cursor: default;
+    }
+
+    .calendar-day.today {
+      background: rgba(106, 17, 203, 0.1);
+    }
+
+    .calendar-day-number {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .calendar-day.today .calendar-day-number {
+      color: var(--primary);
+    }
+
+    .calendar-event {
+      background: rgba(106, 17, 203, 0.1);
+      border-radius: 3px;
+      padding: 2px 5px;
+      margin-top: 20px;
+      font-size: 0.7rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--primary);
+    }
+
+    .calendar-day.today .calendar-event {
+      background: rgba(106, 17, 203, 0.2);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(20px);
+      transition: var(--transition);
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray);
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      background: var(--white);
+      transition: var(--transition);
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: #5a0db3;
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 15px;
+      }
+
+      .content-wrapper {
+        padding: 20px 15px;
+      }
+
+      .search-bar input {
+        width: 150px;
+      }
+
+      .search-bar input:focus {
+        width: 180px;
+      }
+
+      .user-name {
+        display: none;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="toggle-sidebar" id="toggleSidebar">
+        <i class="fas fa-chevron-left"></i>
+      </div>
+      <div class="logo-container">
+        <img src="medilonglogo1.jpg" alt="Medilong" class="logo-img">
+        <span class="logo-text">MediLong</span>
+      </div>
+      <nav class="nav-menu">
+        <div class="nav-item active" data-page="dashboard">
+          <i class="fas fa-tachometer-alt nav-icon"></i>
+          <span class="nav-item-text">Dashboard</span>
+        </div>
+      
+        <div class="nav-item" id="logout">
+          <i class="fas fa-sign-out-alt nav-icon"></i>
+          <span class="nav-item-text">Logout</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <h1>Doctor Dashboard</h1>
+        </div>
+        <div class="header-right">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." id="globalSearch">
+          </div>
+          <div class="notification-bell" id="notificationBell">
+            <i class="fas fa-bell"></i>
+            <span class="notification-count" id="notificationCount">3</span>
+          </div>
+          <div class="user-profile">
+            <div class="user-avatar">DR</div>
+            <div class="user-name" id="doctorName">Dr. Name</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="content-wrapper" id="mainContent">
+        <div class="dashboard-header">
+          <div class="welcome-message">
+            <h2 id="welcomeMessage">Welcome Back, Dr. Name</h2>
+            <p>Here's what's happening with your practice today</p>
+          </div>
+          <div class="date-time" id="currentDateTime">Monday, June 10, 2024 | 10:30 AM</div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+          <div class="stat-card primary">
+            <div class="stat-card-header">
+              <div class="stat-card-title">Today's Appointments</div>
+              <div class="stat-card-icon">
+                <i class="fas fa-calendar-day"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="todayAppointments">8</div>
+            <div class="stat-card-footer">
+              <span>2 more than yesterday</span>
+              <span class="stat-trend"><i class="fas fa-arrow-up trend-up"></i></span>
+            </div>
+          </div>
+          
+          <div class="stat-card warning">
+            <div class="stat-card-header">
+              <div class="stat-card-title">Pending Prescriptions</div>
+              <div class="stat-card-icon">
+                <i class="fas fa-prescription-bottle-alt"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="pendingPrescriptions">5</div>
+            <div class="stat-card-footer">
+              <span>1 awaiting approval</span>
+              <span class="stat-trend"><i class="fas fa-arrow-down trend-down"></i></span>
+            </div>
+          </div>
+          
+          <div class="stat-card danger">
+            <div class="stat-card-header">
+              <div class="stat-card-title">Urgent Cases</div>
+              <div class="stat-card-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="urgentCases">3</div>
+            <div class="stat-card-footer">
+              <span>Needs attention</span>
+              <span class="stat-trend"><i class="fas fa-exclamation-circle"></i></span>
+            </div>
+          </div>
+          
+          <div class="stat-card success">
+            <div class="stat-card-header">
+              <div class="stat-card-title">Completed Today</div>
+              <div class="stat-card-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="completedToday">4</div>
+            <div class="stat-card-footer">
+              <span>Good progress</span>
+              <span class="stat-trend"><i class="fas fa-arrow-up trend-up"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h3 class="section-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+          <div class="action-buttons">
+            <a href="#" class="action-button" id="newPrescriptionBtn">
+              <div class="action-icon">
+                <i class="fas fa-prescription-bottle-alt"></i>
+              </div>
+              <div class="action-text">New Prescription</div>
+            </a>
+            <a href="#" class="action-button" id="scheduleAppointmentBtn">
+              <div class="action-icon">
+                <i class="fas fa-calendar-plus"></i>
+              </div>
+              <div class="action-text">Schedule Appointment</div>
+            </a>
+            <a href="#" class="action-button" id="uploadReportBtn">
+              <div class="action-icon">
+                <i class="fas fa-file-upload"></i>
+              </div>
+              <div class="action-text">Upload Report</div>
+            </a>
+            <a href="#" class="action-button" id="addPatientBtn">
+              <div class="action-icon">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="action-text">Add Patient</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Dashboard Sections -->
+        <div class="dashboard-sections">
+          <!-- Appointments Widget -->
+          <div class="widget appointments-widget">
+            <div class="widget-header">
+              <h3 class="widget-title"><i class="fas fa-calendar-day"></i> Today's Appointments</h3>
+              <div class="widget-actions">
+                <button class="widget-action" id="refreshAppointments"><i class="fas fa-sync-alt"></i></button>
+                <button class="widget-action see-all" id="viewAllAppointments">See All</button>
+              </div>
+            </div>
+            
+            <div id="appointmentsList">
+              <!-- Appointments will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Recent Patients Widget -->
+          <div class="widget patients-widget">
+            <div class="widget-header">
+              <h3 class="widget-title"><i class="fas fa-user-injured"></i> Recent Patients</h3>
+              <div class="widget-actions">
+                <button class="widget-action" id="refreshPatients"><i class="fas fa-sync-alt"></i></button>
+                <button class="widget-action see-all" id="viewAllPatients">See All</button>
+              </div>
+            </div>
+            
+            <div id="patientsList">
+              <!-- Patients will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Tasks Widget -->
+          <div class="widget tasks-widget">
+            <div class="widget-header">
+              <h3 class="widget-title"><i class="fas fa-tasks"></i> Tasks</h3>
+              <div class="widget-actions">
+                <button class="widget-action" id="addTaskBtn"><i class="fas fa-plus"></i></button>
+                <button class="widget-action see-all" id="viewAllTasks">See All</button>
+              </div>
+            </div>
+            
+            <div id="tasksList">
+              <!-- Tasks will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Messages Widget -->
+          <div class="widget messages-widget">
+            <div class="widget-header">
+              <h3 class="widget-title"><i class="fas fa-envelope"></i> Messages</h3>
+              <div class="widget-actions">
+                <button class="widget-action" id="refreshMessages"><i class="fas fa-sync-alt"></i></button>
+                <button class="widget-action see-all" id="viewAllMessages">See All</button>
+              </div>
+            </div>
+            
+            <div id="messagesList">
+              <!-- Messages will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar Widget -->
+        <div class="widget calendar-widget">
+          <div class="widget-header">
+            <h3 class="widget-title"><i class="fas fa-calendar-alt"></i> <span id="calendarMonthYear">June 2024</span></h3>
+            <div class="calendar-nav">
+              <button class="calendar-nav-button" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+              <button class="calendar-nav-button" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+          
+          <div class="calendar-grid" id="calendarGrid">
+            <!-- Calendar will be generated here -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Appointment Modal -->
+  <div class="modal-overlay" id="appointmentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Schedule New Appointment</h3>
+        <button class="modal-close" id="closeAppointmentModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="appointmentForm">
+          <div class="form-group">
+            <label class="form-label">Patient</label>
+            <select class="form-select" id="appointmentPatient" required>
+              <option value="">Select Patient</option>
+              <!-- Patients will be loaded here -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="appointmentDate" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <input type="time" class="form-control" id="appointmentTime" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Purpose</label>
+            <input type="text" class="form-control" id="appointmentPurpose" placeholder="e.g. Follow-up, Checkup" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" id="appointmentNotes" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelAppointment">Cancel</button>
+        <button class="btn btn-primary" id="saveAppointment">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Patient Modal -->
+  <div class="modal-overlay" id="patientModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Patient</h3>
+        <button class="modal-close" id="closePatientModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="patientForm">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="patientName" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" id="patientDob" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select class="form-select" id="patientGender" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-control" id="patientPhone" placeholder="+1 (123) 456-7890">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="patientEmail" placeholder="john@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" id="patientAddress" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Medical History</label>
+            <textarea class="form-control" id="patientHistory" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelPatient">Cancel</button>
+        <button class="btn btn-primary" id="savePatient">Save Patient</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Task</h3>
+        <button class="modal-close" id="closeTaskModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="taskForm">
+          <div class="form-group">
+            <label class="form-label">Task Description</label>
+            <input type="text" class="form-control" id="taskDescription" placeholder="What needs to be done?" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <select class="form-select" id="taskPriority" required>
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="form-control" id="taskDueDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Related To</label>
+            <select class="form-select" id="taskRelated">
+              <option value="">None</option>
+              <option value="Patient">Patient</option>
+              <option value="Appointment">Appointment</option>
+              <option value="Prescription">Prescription</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" id="taskNotes" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelTask">Cancel</button>
+        <button class="btn btn-primary" id="saveTask">Save Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Prescription Modal -->
+  <div class="modal-overlay" id="prescriptionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">New Prescription</h3>
+        <button class="modal-close" id="closePrescriptionModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="prescriptionForm">
+          <div class="form-group">
+            <label class="form-label">Patient</label>
+            <select class="form-select" id="prescriptionPatient" required>
+              <option value="">Select Patient</option>
+              <!-- Patients will be loaded here -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Medication</label>
+            <input type="text" class="form-control" id="prescriptionMedication" placeholder="e.g. Amoxicillin 500mg" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dosage</label>
+            <input type="text" class="form-control" id="prescriptionDosage" placeholder="e.g. 1 tablet twice daily" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <input type="text" class="form-control" id="prescriptionDuration" placeholder="e.g. 7 days">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructions</label>
+            <textarea class="form-control" id="prescriptionInstructions" rows="3" placeholder="Special instructions..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Refills</label>
+            <select class="form-select" id="prescriptionRefills">
+              <option value="0">No refills</option>
+              <option value="1">1 refill</option>
+              <option value="2">2 refills</option>
+              <option value="3">3 refills</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelPrescription">Cancel</button>
+        <button class="btn btn-primary" id="savePrescription">Save Prescription</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View All Modal -->
+  <div class="modal-overlay" id="viewAllModal">
+    <div class="modal" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="viewAllModalTitle">All Items</h3>
+        <button class="modal-close" id="closeViewAllModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="viewAllContent">
+          <!-- Content will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="closeViewAllBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Local Storage Keys
+    const STORAGE_KEYS = {
+      PATIENTS: 'doctorDashboard_patients',
+      APPOINTMENTS: 'doctorDashboard_appointments',
+      TASKS: 'doctorDashboard_tasks',
+      MESSAGES: 'doctorDashboard_messages',
+      PRESCRIPTIONS: 'doctorDashboard_prescriptions',
+      DOCTOR: 'doctorDashboard_doctor',
+      CALENDAR_MONTH: 'doctorDashboard_calendarMonth'
+    };
+
+    // Initialize Data
+    let doctorData = {
+      name: "Dr. Name",
+      specialty: "Cardiologist",
+      email: "doctor@medilong.com",
+      phone: "+1 (123) 456-7890",
+      address: "123 Medical Center, City, State",
+      notifications: 3
+    };
+
+    let patients = [];
+    let appointments = [];
+    let tasks = [];
+    let messages = [];
+    let prescriptions = [];
+    let currentCalendarMonth = new Date().getMonth();
+    let currentCalendarYear = new Date().getFullYear();
+
+    // DOM Elements
+    const sidebar = document.getElementById('sidebar');
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const navItems = document.querySelectorAll('.nav-item');
+    const currentDateTime = document.getElementById('currentDateTime');
+    const logoutBtn = document.getElementById('logout');
+    const scheduleAppointmentBtn = document.getElementById('scheduleAppointmentBtn');
+    const addPatientBtn = document.getElementById('addPatientBtn');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const newPrescriptionBtn = document.getElementById('newPrescriptionBtn');
+    const uploadReportBtn = document.getElementById('uploadReportBtn');
+    const refreshAppointments = document.getElementById('refreshAppointments');
+    const refreshPatients = document.getElementById('refreshPatients');
+    const refreshMessages = document.getElementById('refreshMessages');
+    const viewAllAppointments = document.getElementById('viewAllAppointments');
+    const viewAllPatients = document.getElementById('viewAllPatients');
+    const viewAllTasks = document.getElementById('viewAllTasks');
+    const viewAllMessages = document.getElementById('viewAllMessages');
+    const globalSearch = document.getElementById('globalSearch');
+    const notificationBell = document.getElementById('notificationBell');
+    const notificationCount = document.getElementById('notificationCount');
+    const doctorName = document.getElementById('doctorName');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    
+    // Modal Elements
+    const appointmentModal = document.getElementById('appointmentModal');
+    const closeAppointmentModal = document.getElementById('closeAppointmentModal');
+    const cancelAppointment = document.getElementById('cancelAppointment');
+    const saveAppointment = document.getElementById('saveAppointment');
+    const appointmentForm = document.getElementById('appointmentForm');
+    
+    const patientModal = document.getElementById('patientModal');
+    const closePatientModal = document.getElementById('closePatientModal');
+    const cancelPatient = document.getElementById('cancelPatient');
+    const savePatient = document.getElementById('savePatient');
+    const patientForm = document.getElementById('patientForm');
+    
+    const taskModal = document.getElementById('taskModal');
+    const closeTaskModal = document.getElementById('closeTaskModal');
+    const cancelTask = document.getElementById('cancelTask');
+    const saveTask = document.getElementById('saveTask');
+    const taskForm = document.getElementById('taskForm');
+    
+    const prescriptionModal = document.getElementById('prescriptionModal');
+    const closePrescriptionModal = document.getElementById('closePrescriptionModal');
+    const cancelPrescription = document.getElementById('cancelPrescription');
+    const savePrescription = document.getElementById('savePrescription');
+    const prescriptionForm = document.getElementById('prescriptionForm');
+
+    const viewAllModal = document.getElementById('viewAllModal');
+    const closeViewAllModal = document.getElementById('closeViewAllModal');
+    const closeViewAllBtn = document.getElementById('closeViewAllBtn');
+    const viewAllModalTitle = document.getElementById('viewAllModalTitle');
+    const viewAllContent = document.getElementById('viewAllContent');
+
+    // Calendar Elements
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+    const calendarMonthYear = document.getElementById('calendarMonthYear');
+    const calendarGrid = document.getElementById('calendarGrid');
+
+    // List Containers
+    const appointmentsList = document.getElementById('appointmentsList');
+    const patientsList = document.getElementById('patientsList');
+    const tasksList = document.getElementById('tasksList');
+    const messagesList = document.getElementById('messagesList');
+
+    // Stats Elements
+    const todayAppointments = document.getElementById('todayAppointments');
+    const pendingPrescriptions = document.getElementById('pendingPrescriptions');
+    const urgentCases = document.getElementById('urgentCases');
+    const completedToday = document.getElementById('completedToday');
+
+    // Initialize the application
+    function init() {
+      loadData();
+      setupEventListeners();
+      updateDateTime();
+      setInterval(updateDateTime, 60000);
+      renderDashboard();
+      generateCalendar();
+      updateDoctorInfo();
+    }
+
+    // Load data from local storage
+    function loadData() {
+      // Load doctor data
+      const savedDoctor = localStorage.getItem(STORAGE_KEYS.DOCTOR);
+      if (savedDoctor) {
+        doctorData = JSON.parse(savedDoctor);
+      } else {
+        localStorage.setItem(STORAGE_KEYS.DOCTOR, JSON.stringify(doctorData));
+      }
+
+      // Load calendar month
+      const savedCalendarMonth = localStorage.getItem(STORAGE_KEYS.CALENDAR_MONTH);
+      if (savedCalendarMonth) {
+        const { month, year } = JSON.parse(savedCalendarMonth);
+        currentCalendarMonth = month;
+        currentCalendarYear = year;
+      }
+
+      // Load patients
+      const savedPatients = localStorage.getItem(STORAGE_KEYS.PATIENTS);
+      if (savedPatients) {
+        patients = JSON.parse(savedPatients);
+      } else {
+        // Sample patients if none exist
+        patients = [
+          {
+            id: generateId(),
+            name: "Manoj Kumar",
+            dob: "2005-05-15",
+            gender: "Male",
+            phone: "+91 9876543210",
+            email: "manoj@example.com",
+            address: "123 Main St, Chennai",
+            history: "Allergic to penicillin",
+            lastVisit: new Date().toISOString()
+          },
+          {
+            id: generateId(),
+            name: "Sridhar Venkat",
+            dob: "2004-08-22",
+            gender: "Male",
+            phone: "+91 8765432109",
+            email: "sridhar@example.com",
+            address: "456 Oak Ave, Bangalore",
+            history: "Hypertension",
+            lastVisit: new Date(Date.now() - 86400000).toISOString() // Yesterday
+          },
+          {
+            id: generateId(),
+            name: "Kamalesh Rajan",
+            dob: "2003-11-30",
+            gender: "Male",
+            phone: "+91 7654321098",
+            email: "kamalesh@example.com",
+            address: "789 Pine Rd, Mumbai",
+            history: "Type 2 Diabetes",
+            lastVisit: new Date(Date.now() - 172800000).toISOString() // 2 days ago
+          }
+        ];
+        localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(patients));
+      }
+
+      // Load appointments
+      const savedAppointments = localStorage.getItem(STORAGE_KEYS.APPOINTMENTS);
+      if (savedAppointments) {
+        appointments = JSON.parse(savedAppointments);
+      } else {
+        // Sample appointments if none exist
+        const today = new Date();
+        appointments = [
+          {
+            id: generateId(),
+            patientId: patients[0].id,
+            patientName: patients[0].name,
+            date: formatDate(today),
+            time: "09:00",
+            purpose: "Follow-up Consultation",
+            status: "Confirmed",
+            notes: "Check blood pressure results"
+          },
+          {
+            id: generateId(),
+            patientId: patients[1].id,
+            patientName: patients[1].name,
+            date: formatDate(today),
+            time: "10:30",
+            purpose: "Annual Physical Exam",
+            status: "Confirmed",
+            notes: "Complete physical with lab work"
+          },
+          {
+            id: generateId(),
+            patientId: patients[2].id,
+            patientName: patients[2].name,
+            date: formatDate(today),
+            time: "12:00",
+            purpose: "Post-Op Checkup",
+            status: "Pending",
+            notes: "Follow-up from knee surgery"
+          }
+        ];
+        localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
+      }
+
+      // Load tasks
+      const savedTasks = localStorage.getItem(STORAGE_KEYS.TASKS);
+      if (savedTasks) {
+        tasks = JSON.parse(savedTasks);
+      } else {
+        // Sample tasks if none exist
+        tasks = [
+          {
+            id: generateId(),
+            description: "Review lab results for Patient #12345",
+            priority: "High",
+            dueDate: formatDate(new Date()),
+            completed: false,
+            relatedTo: "Patient",
+            notes: "Check for abnormal values"
+          },
+          {
+            id: generateId(),
+            description: "Approve prescription refills",
+            priority: "Medium",
+            dueDate: formatDate(new Date(Date.now() - 86400000)),
+            completed: true,
+            relatedTo: "Prescription",
+            notes: "3 pending refills"
+          },
+          {
+            id: generateId(),
+            description: "Prepare surgery notes for tomorrow",
+            priority: "Medium",
+            dueDate: formatDate(new Date(Date.now() + 86400000)),
+            completed: false,
+            relatedTo: "Surgery",
+            notes: "Knee replacement procedure"
+          }
+        ];
+        localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+      }
+
+      // Load messages
+      const savedMessages = localStorage.getItem(STORAGE_KEYS.MESSAGES);
+      if (savedMessages) {
+        messages = JSON.parse(savedMessages);
+      } else {
+        // Sample messages if none exist
+        messages = [
+          {
+            id: generateId(),
+            sender: "Dr. Manikandan",
+            subject: "Regarding the Johnson case",
+            preview: "We need to discuss the treatment plan for the Johnson case...",
+            time: "10:15 AM",
+            read: false
+          },
+          {
+            id: generateId(),
+            sender: "Nursing Staff",
+            subject: "Patient in Room 4",
+            preview: "Patient in Room 4 needs pain medication adjustment...",
+            time: "Yesterday",
+            read: true
+          },
+          {
+            id: generateId(),
+            sender: "Hospital Admin",
+            subject: "Quarterly staff meeting",
+            preview: "Reminder: Quarterly staff meeting tomorrow at 2 PM",
+            time: "Jun 8",
+            read: true
+          }
+        ];
+        localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
+      }
+
+      // Load prescriptions
+      const savedPrescriptions = localStorage.getItem(STORAGE_KEYS.PRESCRIPTIONS);
+      if (savedPrescriptions) {
+        prescriptions = JSON.parse(savedPrescriptions);
+      } else {
+        // Sample prescriptions if none exist
+        prescriptions = [
+          {
+            id: generateId(),
+            patientId: patients[0].id,
+            patientName: patients[0].name,
+            medication: "Amoxicillin 500mg",
+            dosage: "1 tablet twice daily",
+            duration: "7 days",
+            instructions: "Take with food",
+            refills: 1,
+            date: formatDate(new Date()),
+            status: "Pending"
+          },
+          {
+            id: generateId(),
+            patientId: patients[1].id,
+            patientName: patients[1].name,
+            medication: "Lisinopril 10mg",
+            dosage: "1 tablet daily",
+            duration: "30 days",
+            instructions: "Take in the morning",
+            refills: 3,
+            date: formatDate(new Date(Date.now() - 86400000)),
+            status: "Approved"
+          },
+          {
+            id: generateId(),
+            patientId: patients[2].id,
+            patientName: patients[2].name,
+            medication: "Metformin 1000mg",
+            dosage: "1 tablet twice daily",
+            duration: "30 days",
+            instructions: "Take with meals",
+            refills: 2,
+            date: formatDate(new Date(Date.now() - 172800000)),
+            status: "Approved"
+          }
+        ];
+        localStorage.setItem(STORAGE_KEYS.PRESCRIPTIONS, JSON.stringify(prescriptions));
+      }
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+      // Sidebar toggle
+      toggleSidebar.addEventListener('click', toggleSidebarCollapse);
+
+      // Navigation items - now all on single page
+      navItems.forEach(item => {
+        if (item.id !== 'logout') {
+          item.addEventListener('click', () => {
+            // Highlight the selected nav item
+            navItems.forEach(navItem => navItem.classList.remove('active'));
+            item.classList.add('active');
+          });
+        }
+      });
+
+      // Logout
+      logoutBtn.addEventListener('click', logout);
+
+      // Quick action buttons
+      scheduleAppointmentBtn.addEventListener('click', openAppointmentModal);
+      addPatientBtn.addEventListener('click', openPatientModal);
+      addTaskBtn.addEventListener('click', openTaskModal);
+      newPrescriptionBtn.addEventListener('click', openPrescriptionModal);
+      uploadReportBtn.addEventListener('click', () => {
+        alert('Upload Report functionality will be implemented');
+        // In a real app, this would open a file upload dialog
+      });
+
+      // Refresh buttons
+      refreshAppointments.addEventListener('click', renderAppointments);
+      refreshPatients.addEventListener('click', renderPatients);
+      refreshMessages.addEventListener('click', renderMessages);
+
+      // View All buttons
+      viewAllAppointments.addEventListener('click', () => openViewAllModal('Appointments', renderAllAppointments));
+      viewAllPatients.addEventListener('click', () => openViewAllModal('Patients', renderAllPatients));
+      viewAllTasks.addEventListener('click', () => openViewAllModal('Tasks', renderAllTasks));
+      viewAllMessages.addEventListener('click', () => openViewAllModal('Messages', renderAllMessages));
+
+      // Appointment modal
+      closeAppointmentModal.addEventListener('click', closeModal.bind(null, appointmentModal));
+      cancelAppointment.addEventListener('click', closeModal.bind(null, appointmentModal));
+      saveAppointment.addEventListener('click', saveNewAppointment);
+
+      // Patient modal
+      closePatientModal.addEventListener('click', closeModal.bind(null, patientModal));
+      cancelPatient.addEventListener('click', closeModal.bind(null, patientModal));
+      savePatient.addEventListener('click', saveNewPatient);
+
+      // Task modal
+      closeTaskModal.addEventListener('click', closeModal.bind(null, taskModal));
+      cancelTask.addEventListener('click', closeModal.bind(null, taskModal));
+      saveTask.addEventListener('click', saveNewTask);
+
+      // Prescription modal
+      closePrescriptionModal.addEventListener('click', closeModal.bind(null, prescriptionModal));
+      cancelPrescription.addEventListener('click', closeModal.bind(null, prescriptionModal));
+      savePrescription.addEventListener('click', saveNewPrescription);
+
+      // View All modal
+      closeViewAllModal.addEventListener('click', closeModal.bind(null, viewAllModal));
+      closeViewAllBtn.addEventListener('click', closeModal.bind(null, viewAllModal));
+
+      // Calendar navigation
+      prevMonthBtn.addEventListener('click', showPreviousMonth);
+      nextMonthBtn.addEventListener('click', showNextMonth);
+
+      // Global search
+      globalSearch.addEventListener('input', handleGlobalSearch);
+
+      // Notification bell
+      notificationBell.addEventListener('click', showNotifications);
+    }
+
+    // Update doctor info in UI
+    function updateDoctorInfo() {
+      doctorName.textContent = doctorData.name;
+      welcomeMessage.textContent = `Welcome Back, ${doctorData.name}`;
+      notificationCount.textContent = doctorData.notifications;
+    }
+
+    // Toggle sidebar collapse
+    function toggleSidebarCollapse() {
+      sidebar.classList.toggle('sidebar-collapsed');
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // In a real application, this would redirect to login page
+        alert('Logging out... Redirecting to login page');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Update current date and time
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateString = now.toLocaleDateString('en-US', options);
+      const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      currentDateTime.textContent = `${dateString} | ${timeString}`;
+    }
+
+    // Open modal functions
+    function openAppointmentModal() {
+      // Load patients into dropdown
+      loadPatientsDropdown(appointmentPatient);
+      // Set default date to today
+      document.getElementById('appointmentDate').valueAsDate = new Date();
+      openModal(appointmentModal);
+    }
+
+    function openPatientModal() {
+      // Reset form and open modal
+      patientForm.reset();
+      openModal(patientModal);
+    }
+
+    function openTaskModal() {
+      // Set default due date to today
+      document.getElementById('taskDueDate').valueAsDate = new Date();
+      openModal(taskModal);
+    }
+
+    function openPrescriptionModal() {
+      // Load patients into dropdown
+      loadPatientsDropdown(prescriptionPatient);
+      openModal(prescriptionModal);
+    }
+
+    function openViewAllModal(title, renderFunction) {
+      viewAllModalTitle.textContent = `All ${title}`;
+      viewAllContent.innerHTML = '';
+      renderFunction(viewAllContent, true); // Pass true to indicate "view all" mode
+      openModal(viewAllModal);
+    }
+
+    function openModal(modal) {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      // Reset form if it exists
+      if (modal.querySelector('form')) {
+        modal.querySelector('form').reset();
+      }
+    }
+
+    // Load patients into dropdown
+    function loadPatientsDropdown(dropdown) {
+      dropdown.innerHTML = '<option value="">Select Patient</option>';
+      patients.forEach(patient => {
+        const option = document.createElement('option');
+        option.value = patient.id;
+        option.textContent = patient.name;
+        dropdown.appendChild(option);
+      });
+    }
+
+    // Save new appointment
+    function saveNewAppointment() {
+      if (!appointmentForm.checkValidity()) {
+        appointmentForm.reportValidity();
+        return;
+      }
+
+      const newAppointment = {
+        id: generateId(),
+        patientId: appointmentPatient.value,
+        patientName: appointmentPatient.options[appointmentPatient.selectedIndex].text,
+        date: appointmentDate.value,
+        time: appointmentTime.value,
+        purpose: appointmentPurpose.value,
+        status: "Pending",
+        notes: appointmentNotes.value
+      };
+
+      appointments.push(newAppointment);
+      localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
+      renderAppointments();
+      updateStats();
+      generateCalendar(); // Refresh calendar to show new appointment
+      closeModal(appointmentModal);
+    }
+
+    // Save new patient
+    function saveNewPatient() {
+      if (!patientForm.checkValidity()) {
+        patientForm.reportValidity();
+        return;
+      }
+
+      const newPatient = {
+        id: generateId(),
+        name: patientName.value,
+        dob: patientDob.value,
+        gender: patientGender.value,
+        phone: patientPhone.value,
+        email: patientEmail.value,
+        address: patientAddress.value,
+        history: patientHistory.value,
+        lastVisit: new Date().toISOString()
+      };
+
+      patients.push(newPatient);
+      localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(patients));
+      renderPatients();
+      updateStats();
+      closeModal(patientModal);
+    }
+
+    // Save new task
+    function saveNewTask() {
+      if (!taskForm.checkValidity()) {
+        taskForm.reportValidity();
+        return;
+      }
+
+      const newTask = {
+        id: generateId(),
+        description: taskDescription.value,
+        priority: taskPriority.value,
+        dueDate: taskDueDate.value || null,
+        completed: false,
+        relatedTo: taskRelated.value,
+        notes: taskNotes.value
+      };
+
+      tasks.push(newTask);
+      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+      renderTasks();
+      updateStats();
+      closeModal(taskModal);
+    }
+
+    // Save new prescription
+    function saveNewPrescription() {
+      if (!prescriptionForm.checkValidity()) {
+        prescriptionForm.reportValidity();
+        return;
+      }
+
+      const newPrescription = {
+        id: generateId(),
+        patientId: prescriptionPatient.value,
+        patientName: prescriptionPatient.options[prescriptionPatient.selectedIndex].text,
+        medication: prescriptionMedication.value,
+        dosage: prescriptionDosage.value,
+        duration: prescriptionDuration.value,
+        instructions: prescriptionInstructions.value,
+        refills: parseInt(prescriptionRefills.value),
+        date: formatDate(new Date()),
+        status: "Pending"
+      };
+
+      prescriptions.push(newPrescription);
+      localStorage.setItem(STORAGE_KEYS.PRESCRIPTIONS, JSON.stringify(prescriptions));
+      updateStats();
+      closeModal(prescriptionModal);
+    }
+
+    // Render dashboard
+    function renderDashboard() {
+      renderAppointments();
+      renderPatients();
+      renderTasks();
+      renderMessages();
+      updateStats();
+    }
+
+    // Render appointments
+    function renderAppointments(container = appointmentsList, all = false) {
+      const today = formatDate(new Date());
+      let apptsToRender = appointments;
+      
+      if (!all) {
+        // For dashboard view, show only today's appointments
+        apptsToRender = appointments.filter(apt => apt.date === today)
+          .sort((a, b) => a.time.localeCompare(b.time));
+      } else {
+        // For "view all" mode, show all appointments sorted by date
+        apptsToRender = [...appointments].sort((a, b) => {
+          const dateCompare = new Date(a.date) - new Date(b.date);
+          if (dateCompare !== 0) return dateCompare;
+          return a.time.localeCompare(b.time);
+        });
+      }
+
+      container.innerHTML = '';
+
+      if (apptsToRender.length === 0) {
+        container.innerHTML = '<div class="empty-state">No appointments found</div>';
+        return;
+      }
+
+      apptsToRender.forEach(appt => {
+        const apptItem = document.createElement('div');
+        apptItem.className = 'appointment-item';
+        apptItem.innerHTML = `
+          <div class="appointment-time">${formatTime(appt.time)}</div>
+          <div class="appointment-details">
+            <div class="patient-name">${appt.patientName}</div>
+            <div class="appointment-purpose">${appt.purpose}</div>
+            <div class="appointment-date">${formatDateForDisplay(appt.date)}</div>
+            <div class="appointment-status ${appt.status === 'Confirmed' ? 'status-confirmed' : 'status-pending'}">
+              ${appt.status}
+            </div>
+          </div>
+          <div class="appointment-actions">
+            <button class="appointment-action" data-id="${appt.id}" title="Complete">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="appointment-action" data-id="${appt.id}" title="Reschedule">
+              <i class="fas fa-clock"></i>
+            </button>
+            <button class="appointment-action" data-id="${appt.id}" title="Cancel">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(apptItem);
+      });
+
+      // Add event listeners to appointment actions
+      container.querySelectorAll('.appointment-action').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const appointmentId = btn.dataset.id;
+          const action = btn.querySelector('i').className.includes('check') ? 'complete' : 
+                         btn.querySelector('i').className.includes('clock') ? 'reschedule' : 'cancel';
+          handleAppointmentAction(appointmentId, action);
+        });
+      });
+    }
+
+    // Render all appointments for "View All" modal
+    function renderAllAppointments(container) {
+      renderAppointments(container, true);
+    }
+
+    // Handle appointment actions
+    function handleAppointmentAction(id, action) {
+      const appointment = appointments.find(a => a.id === id);
+      if (!appointment) return;
+
+      if (action === 'complete') {
+        if (confirm(`Mark appointment with ${appointment.patientName} as completed?`)) {
+          appointment.status = "Completed";
+          localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
+          renderAppointments();
+          updateStats();
+          generateCalendar();
+        }
+      } 
+      else if (action === 'reschedule') {
+        openAppointmentModal();
+        // Pre-fill the form with appointment details
+        document.getElementById('appointmentPatient').value = appointment.patientId;
+        document.getElementById('appointmentDate').value = appointment.date;
+        document.getElementById('appointmentTime').value = appointment.time;
+        document.getElementById('appointmentPurpose').value = appointment.purpose;
+        document.getElementById('appointmentNotes').value = appointment.notes || '';
+      }
+      else if (action === 'cancel') {
+        if (confirm(`Cancel appointment with ${appointment.patientName}?`)) {
+          appointments = appointments.filter(a => a.id !== id);
+          localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
+          renderAppointments();
+          updateStats();
+          generateCalendar();
+        }
+      }
+    }
+
+    // Render patients
+    function renderPatients(container = patientsList, all = false) {
+      // Sort by last visit (newest first)
+      let patientsToRender = [...patients]
+        .sort((a, b) => new Date(b.lastVisit) - new Date(a.lastVisit));
+      
+      if (!all) {
+        // For dashboard view, show only recent patients
+        patientsToRender = patientsToRender.slice(0, 5);
+      }
+
+      container.innerHTML = '';
+
+      if (patientsToRender.length === 0) {
+        container.innerHTML = '<div class="empty-state">No patients found</div>';
+        return;
+      }
+
+      patientsToRender.forEach(patient => {
+        const patientItem = document.createElement('div');
+        patientItem.className = 'patient-item';
+        
+        // Get initials for avatar
+        const initials = patient.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        
+        // Calculate age from DOB
+        const age = patient.dob ? calculateAge(patient.dob) : 'N/A';
+        
+        // Format last visit date
+        const lastVisit = formatRelativeDate(patient.lastVisit);
+        
+        patientItem.innerHTML = `
+          <div class="patient-avatar">${initials}</div>
+          <div class="patient-info">
+            <div class="patient-name">${patient.name}</div>
+            <div class="patient-meta">Age: ${age} | Last Visit: ${lastVisit}</div>
+            ${all ? `<div class="patient-meta">Phone: ${patient.phone || 'N/A'} | Email: ${patient.email || 'N/A'}</div>` : ''}
+          </div>
+          <div class="patient-actions">
+            <button class="patient-action" data-id="${patient.id}" title="View Details">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="patient-action" data-id="${patient.id}" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            ${all ? `<button class="patient-action" data-id="${patient.id}" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>` : ''}
+          </div>
+        `;
+        container.appendChild(patientItem);
+      });
+
+      // Add event listeners to patient actions
+      container.querySelectorAll('.patient-action').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const patientId = btn.dataset.id;
+          const action = btn.querySelector('i').className.includes('eye') ? 'view' : 
+                         btn.querySelector('i').className.includes('edit') ? 'edit' : 'delete';
+          handlePatientAction(patientId, action);
+        });
+      });
+    }
+
+    // Render all patients for "View All" modal
+    function renderAllPatients(container) {
+      renderPatients(container, true);
+    }
+
+    // Handle patient actions
+    function handlePatientAction(id, action) {
+      const patient = patients.find(p => p.id === id);
+      if (!patient) return;
+
+      if (action === 'view') {
+        // Show patient details
+        alert(`Patient Details:\n\nName: ${patient.name}\nDOB: ${patient.dob || 'N/A'}\nGender: ${patient.gender || 'N/A'}\nPhone: ${patient.phone || 'N/A'}\nEmail: ${patient.email || 'N/A'}\nAddress: ${patient.address || 'N/A'}\nMedical History: ${patient.history || 'None'}`);
+      }
+      else if (action === 'edit') {
+        // Open patient modal with data to edit
+        openPatientModal();
+        document.getElementById('patientName').value = patient.name;
+        document.getElementById('patientDob').value = patient.dob || '';
+        document.getElementById('patientGender').value = patient.gender || '';
+        document.getElementById('patientPhone').value = patient.phone || '';
+        document.getElementById('patientEmail').value = patient.email || '';
+        document.getElementById('patientAddress').value = patient.address || '';
+        document.getElementById('patientHistory').value = patient.history || '';
+        
+        // Change save button to update
+        document.getElementById('savePatient').textContent = 'Update Patient';
+        document.getElementById('savePatient').onclick = function() {
+          updatePatient(id);
+        };
+      }
+      else if (action === 'delete') {
+        if (confirm(`Delete patient ${patient.name}? This cannot be undone.`)) {
+          patients = patients.filter(p => p.id !== id);
+          localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(patients));
+          renderPatients();
+          updateStats();
+        }
+      }
+    }
+
+    // Update existing patient
+    function updatePatient(id) {
+      if (!patientForm.checkValidity()) {
+        patientForm.reportValidity();
+        return;
+      }
+
+      const patientIndex = patients.findIndex(p => p.id === id);
+      if (patientIndex === -1) return;
+
+      patients[patientIndex] = {
+        ...patients[patientIndex],
+        name: patientName.value,
+        dob: patientDob.value,
+        gender: patientGender.value,
+        phone: patientPhone.value,
+        email: patientEmail.value,
+        address: patientAddress.value,
+        history: patientHistory.value,
+        lastVisit: new Date().toISOString()
+      };
+
+      localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(patients));
+      renderPatients();
+      updateStats();
+      closeModal(patientModal);
+    }
+
+    // Render tasks
+    function renderTasks(container = tasksList, all = false) {
+      // Sort by priority (High first) and due date
+      let tasksToRender = [...tasks].sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        if (a.priority !== b.priority) {
+          const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3 };
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        }
+        return new Date(a.dueDate || '9999-12-31') - new Date(b.dueDate || '9999-12-31');
+      });
+      
+      if (!all) {
+        // For dashboard view, show only a few tasks
+        tasksToRender = tasksToRender.slice(0, 5);
+      }
+
+      container.innerHTML = '';
+
+      if (tasksToRender.length === 0) {
+        container.innerHTML = '<div class="empty-state">No tasks found</div>';
+        return;
+      }
+
+      tasksToRender.forEach(task => {
+        const taskItem = document.createElement('div');
+        taskItem.className = 'task-item';
+        
+        // Format due date if exists
+        const dueDate = task.dueDate ? `Due: ${formatDateForDisplay(task.dueDate)}` : '';
+        
+        taskItem.innerHTML = `
+          <div class="task-checkbox">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} data-id="${task.id}">
+          </div>
+          <div class="task-content ${task.completed ? 'task-completed' : ''}">
+            ${task.description}
+            ${dueDate ? `<div class="task-due">${dueDate}</div>` : ''}
+            ${all ? `<div class="task-notes">${task.notes || ''}</div>` : ''}
+          </div>
+          <div class="task-priority priority-${task.priority.toLowerCase()}">
+            ${task.priority}
+          </div>
+          ${all ? `
+          <div class="task-actions">
+            <button class="task-action" data-id="${task.id}" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="task-action" data-id="${task.id}" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>` : ''}
+        `;
+        container.appendChild(taskItem);
+      });
+
+      // Add event listeners to task checkboxes
+      container.querySelectorAll('.task-checkbox input').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          const taskId = checkbox.dataset.id;
+          const task = tasks.find(t => t.id === taskId);
+          if (task) {
+            task.completed = checkbox.checked;
+            localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+            renderTasks();
+            updateStats();
+          }
+        });
+      });
+
+      // Add event listeners to task actions in "view all" mode
+      if (all) {
+        container.querySelectorAll('.task-action').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const taskId = btn.dataset.id;
+            const action = btn.querySelector('i').className.includes('edit') ? 'edit' : 'delete';
+            handleTaskAction(taskId, action);
+          });
+        });
+      }
+    }
+
+    // Render all tasks for "View All" modal
+    function renderAllTasks(container) {
+      renderTasks(container, true);
+    }
+
+    // Handle task actions
+    function handleTaskAction(id, action) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      if (action === 'edit') {
+        // Open task modal with data to edit
+        openTaskModal();
+        document.getElementById('taskDescription').value = task.description;
+        document.getElementById('taskPriority').value = task.priority;
+        document.getElementById('taskDueDate').value = task.dueDate || '';
+        document.getElementById('taskRelated').value = task.relatedTo || '';
+        document.getElementById('taskNotes').value = task.notes || '';
+        
+        // Change save button to update
+        document.getElementById('saveTask').textContent = 'Update Task';
+        document.getElementById('saveTask').onclick = function() {
+          updateTask(id);
+        };
+      }
+      else if (action === 'delete') {
+        if (confirm(`Delete task "${task.description}"?`)) {
+          tasks = tasks.filter(t => t.id !== id);
+          localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+          renderTasks();
+          updateStats();
+        }
+      }
+    }
+
+    // Update existing task
+    function updateTask(id) {
+      if (!taskForm.checkValidity()) {
+        taskForm.reportValidity();
+        return;
+      }
+
+      const taskIndex = tasks.findIndex(t => t.id === id);
+      if (taskIndex === -1) return;
+
+      tasks[taskIndex] = {
+        ...tasks[taskIndex],
+        description: taskDescription.value,
+        priority: taskPriority.value,
+        dueDate: taskDueDate.value || null,
+        relatedTo: taskRelated.value,
+        notes: taskNotes.value
+      };
+
+      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+      renderTasks();
+      updateStats();
+      closeModal(taskModal);
+    }
+
+    // Render messages
+    function renderMessages(container = messagesList, all = false) {
+      // Sort by read status and time (newest first)
+      let messagesToRender = [...messages].sort((a, b) => {
+        if (a.read !== b.read) return a.read ? 1 : -1;
+        return new Date(b.time) - new Date(a.time);
+      });
+      
+      if (!all) {
+        // For dashboard view, show only a few messages
+        messagesToRender = messagesToRender.slice(0, 5);
+      }
+
+      container.innerHTML = '';
+
+      if (messagesToRender.length === 0) {
+        container.innerHTML = '<div class="empty-state">No messages found</div>';
+        return;
+      }
+
+      messagesToRender.forEach(message => {
+        const messageItem = document.createElement('div');
+        messageItem.className = `message-item ${message.read ? '' : 'message-unread'}`;
+        
+        // Get initials for avatar
+        const initials = message.sender.split(' ').map(n => n[0]).join('').toUpperCase();
+        
+        messageItem.innerHTML = `
+          <div class="message-avatar">${initials}</div>
+          <div class="message-content">
+            <div class="message-sender">
+              ${message.sender}
+              <span class="message-time">${message.time}</span>
+            </div>
+            <div class="message-subject">${message.subject}</div>
+            <div class="message-preview">${message.preview}</div>
+          </div>
+          ${all ? `
+          <div class="message-actions">
+            <button class="message-action" data-id="${message.id}" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>` : ''}
+        `;
+        container.appendChild(messageItem);
+      });
+
+      // Add event listeners to messages
+      container.querySelectorAll('.message-item').forEach((item, index) => {
+        item.addEventListener('click', () => {
+          // Mark as read when clicked
+          if (!messagesToRender[index].read) {
+            messagesToRender[index].read = true;
+            localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
+            renderMessages();
+          }
+          // Show full message
+          alert(`Message from ${messagesToRender[index].sender}\n\nSubject: ${messagesToRender[index].subject}\n\n${messagesToRender[index].preview}\n\nReceived: ${messagesToRender[index].time}`);
+        });
+      });
+
+      // Add event listeners to message actions in "view all" mode
+      if (all) {
+        container.querySelectorAll('.message-action').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering the message click
+            const messageId = btn.dataset.id;
+            if (confirm('Delete this message?')) {
+              messages = messages.filter(m => m.id !== messageId);
+              localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
+              renderMessages(container, all);
+            }
+          });
+        });
+      }
+    }
+
+    // Render all messages for "View All" modal
+    function renderAllMessages(container) {
+      renderMessages(container, true);
+    }
+
+    // Update stats
+    function updateStats() {
+      const today = formatDate(new Date());
+      
+      // Today's appointments
+      const todaysAppts = appointments.filter(apt => apt.date === today).length;
+      todayAppointments.textContent = todaysAppts;
+      
+      // Pending prescriptions
+      const pendingRx = prescriptions.filter(rx => rx.status === 'Pending').length;
+      pendingPrescriptions.textContent = pendingRx;
+      
+      // Urgent cases (high priority tasks not completed)
+      const urgentTasks = tasks.filter(task => task.priority === 'High' && !task.completed).length;
+      urgentCases.textContent = urgentTasks;
+      
+      // Completed today (completed tasks with today's date)
+      const completedTasks = tasks.filter(task => task.completed && task.dueDate === today).length;
+      completedToday.textContent = completedTasks;
+    }
+
+    // Calendar functions
+    function generateCalendar() {
+      const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+      const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDay = firstDay.getDay();
+      
+      // Update month/year display
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      calendarMonthYear.textContent = `${monthNames[currentCalendarMonth]} ${currentCalendarYear}`;
+      
+      // Save current month to localStorage
+      localStorage.setItem(STORAGE_KEYS.CALENDAR_MONTH, JSON.stringify({
+        month: currentCalendarMonth,
+        year: currentCalendarYear
+      }));
+      
+      // Clear previous calendar
+      calendarGrid.innerHTML = '';
+      
+      // Add day headers
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayNames.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+      });
+      
+      // Add empty cells for days before the 1st
+      for (let i = 0; i < startingDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day empty';
+        calendarGrid.appendChild(emptyDay);
+      }
+      
+      // Add days of the month
+      const today = new Date();
+      const isCurrentMonth = today.getMonth() === currentCalendarMonth && today.getFullYear() === currentCalendarYear;
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        
+        // Check if this is today
+        if (isCurrentMonth && day === today.getDate()) {
+          dayCell.classList.add('today');
+        }
+        
+        dayCell.innerHTML = `<div class="calendar-day-number">${day}</div>`;
+        
+        // Add events for this day
+        const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = appointments.filter(apt => apt.date === dateStr);
+        
+        if (dayEvents.length > 0) {
+          const eventElement = document.createElement('div');
+          eventElement.className = 'calendar-event';
+          eventElement.textContent = `${dayEvents.length} appointment${dayEvents.length > 1 ? 's' : ''}`;
+          dayCell.appendChild(eventElement);
+        }
+        
+        // Add click event to view day details
+        dayCell.addEventListener('click', () => {
+          viewDayDetails(dateStr, dayEvents);
+        });
+        
+        calendarGrid.appendChild(dayCell);
+      }
+    }
+
+    function showPreviousMonth() {
+      currentCalendarMonth--;
+      if (currentCalendarMonth < 0) {
+        currentCalendarMonth = 11;
+        currentCalendarYear--;
+      }
+      generateCalendar();
+    }
+
+    function showNextMonth() {
+      currentCalendarMonth++;
+      if (currentCalendarMonth > 11) {
+        currentCalendarMonth = 0;
+        currentCalendarYear++;
+      }
+      generateCalendar();
+    }
+
+    function viewDayDetails(dateStr, events) {
+      const date = new Date(dateStr);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDate = date.toLocaleDateString('en-US', options);
+      
+      viewAllModalTitle.textContent = `Appointments on ${formattedDate}`;
+      viewAllContent.innerHTML = '';
+      
+      if (events.length === 0) {
+        viewAllContent.innerHTML = '<div class="empty-state">No appointments scheduled for this day</div>';
+      } else {
+        const eventsContainer = document.createElement('div');
+        events.forEach(event => {
+          const eventItem = document.createElement('div');
+          eventItem.className = 'appointment-item';
+          eventItem.innerHTML = `
+            <div class="appointment-time">${formatTime(event.time)}</div>
+            <div class="appointment-details">
+              <div class="patient-name">${event.patientName}</div>
+              <div class="appointment-purpose">${event.purpose}</div>
+              <div class="appointment-status ${event.status === 'Confirmed' ? 'status-confirmed' : 'status-pending'}">
+                ${event.status}
+              </div>
+            </div>
+            <div class="appointment-actions">
+              <button class="appointment-action" data-id="${event.id}" title="Complete">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="appointment-action" data-id="${event.id}" title="Cancel">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          `;
+          eventsContainer.appendChild(eventItem);
+        });
+        viewAllContent.appendChild(eventsContainer);
+        
+        // Add event listeners to appointment actions
+        eventsContainer.querySelectorAll('.appointment-action').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const appointmentId = btn.dataset.id;
+            const action = btn.querySelector('i').className.includes('check') ? 'complete' : 'cancel';
+            handleAppointmentAction(appointmentId, action);
+          });
+        });
+      }
+      
+      openModal(viewAllModal);
+    }
+
+    // Handle global search
+    function handleGlobalSearch() {
+      const searchTerm = globalSearch.value.toLowerCase();
+      if (searchTerm.trim() === '') return;
+      
+      // Search patients
+      const patientResults = patients.filter(patient => 
+        patient.name.toLowerCase().includes(searchTerm) ||
+        (patient.phone && patient.phone.toLowerCase().includes(searchTerm)) ||
+        (patient.email && patient.email.toLowerCase().includes(searchTerm))
+      );
+      
+     // Search appointments
+const appointmentResults = appointments.filter(appt => 
+    appt.patientName.toLowerCase().includes(searchTerm) ||
+    appt.purpose.toLowerCase().includes(searchTerm) ||
+    appt.notes.toLowerCase().includes(searchTerm)
+);
+
+      
+      // Show results in view all modal
+      viewAllModalTitle.textContent = `Search Results for "${searchTerm}"`;
+      viewAllContent.innerHTML = '';
+      
+      if (patientResults.length === 0 && appointmentResults.length === 0) {
+        viewAllContent.innerHTML = '<div class="empty-state">No results found</div>';
+      } else {
+        if (patientResults.length > 0) {
+          const patientSection = document.createElement('div');
+          patientSection.innerHTML = '<h4>Patients</h4>';
+          renderPatients(patientSection, true, patientResults);
+          viewAllContent.appendChild(patientSection);
+        }
+        
+        if (appointmentResults.length > 0) {
+          const appointmentSection = document.createElement('div');
+          appointmentSection.innerHTML = '<h4>Appointments</h4>';
+          renderAppointments(appointmentSection, true, appointmentResults);
+          viewAllContent.appendChild(appointmentSection);
+        }
+      }
+      
+      openModal(viewAllModal);
+    }
+
+    // Show notifications
+    function showNotifications() {
+      viewAllModalTitle.textContent = 'Notifications';
+      viewAllContent.innerHTML = '';
+      
+      // Mark all notifications as read
+      doctorData.notifications = 0;
+      localStorage.setItem(STORAGE_KEYS.DOCTOR, JSON.stringify(doctorData));
+      notificationCount.textContent = '0';
+      
+      // Show notifications (in a real app, these would come from a server)
+      const notifications = [
+        { id: 1, text: "You have 3 pending prescriptions to review", time: "10 minutes ago", read: true },
+        { id: 2, text: "New appointment request from Patient X", time: "2 hours ago", read: true },
+        { id: 3, text: "Lab results available for Patient Y", time: "Yesterday", read: true }
+      ];
+      
+      if (notifications.length === 0) {
+        viewAllContent.innerHTML = '<div class="empty-state">No new notifications</div>';
+      } else {
+        notifications.forEach(notification => {
+          const notificationItem = document.createElement('div');
+          notificationItem.className = 'message-item';
+          notificationItem.innerHTML = `
+            <div class="message-avatar"><i class="fas fa-bell"></i></div>
+            <div class="message-content">
+              <div class="message-sender">
+                ${notification.text}
+                <span class="message-time">${notification.time}</span>
+              </div>
+            </div>
+          `;
+          viewAllContent.appendChild(notificationItem);
+        });
+      }
+      
+      openModal(viewAllModal);
+    }
+
+    // Helper functions
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    function formatDate(date) {
+      if (!date) return '';
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatDateForDisplay(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatTime(time) {
+      if (!time) return '';
+      // Convert "HH:MM" to "HH:MM AM/PM"
+      const [hours, minutes] = time.split(':');
+      const h = parseInt(hours);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const displayH = h % 12 || 12;
+      return `${displayH}:${minutes} ${ampm}`;
+    }
+
+    function formatRelativeDate(dateStr) {
+      if (!dateStr) return 'Never';
+      
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function calculateAge(dobStr) {
+      if (!dobStr) return 'N/A';
+      const dob = new Date(dobStr);
+      const diff = Date.now() - dob.getTime();
+      const ageDate = new Date(diff);
+      return Math.abs(ageDate.getUTCFullYear() - 1970);
+    }
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
